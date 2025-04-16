@@ -1,0 +1,18 @@
+{
+  "manifest_version": 3,
+  "name": "Explain in Vietnamese",
+  "version": "1.0",
+  "description": "Cho phép copy/paste và tạo prompt tiếng Việt từ đoạn văn bản được chọn.",
+  "permissions": ["scripting", "clipboardWrite"],
+  "host_permissions": ["<all_urls>"],
+  "action": {
+    "default_title": "Explain in Vietnamese"
+  },
+  "content_scripts": [
+    {
+      "matches": ["<all_urls>"],
+      "js": ["content.js"],
+      "run_at": "document_idle"
+    }
+  ]
+}
