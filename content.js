@@ -20,7 +20,7 @@ function enableCopy() {
     "cut",
     "contextmenu",
     "mousedown",
-    // "mouseup",
+    "mouseup",
     "selectstart",
     "select",
     "paste",
