@@ -1,18 +1,14 @@
 // Bỏ chặn copy/paste
-// document.addEventListener("copy", (e) => e.stopImmediatePropagation(), true);
-// document.addEventListener("cut", (e) => e.stopImmediatePropagation(), true);
-// document.addEventListener("paste", (e) => e.stopImmediatePropagation(), true);
-
 function addUserSelectCSS() {
   var cssSelectTextCSS = document.createElement("style");
 
   cssSelectTextCSS.type = "text/css";
   cssSelectTextCSS.innerText = `* {
-		-webkit-user-select: text !important;
-		-moz-user-select: text !important;
-		-ms-user-select: text !important;
-		 user-select: text !important;
-	}`;
+          -webkit-user-select: text !important;
+          -moz-user-select: text !important;
+          -ms-user-select: text !important;
+           user-select: text !important;
+      }`;
   document.head.appendChild(cssSelectTextCSS);
 }
 
@@ -34,7 +30,6 @@ function enableCopy() {
     "dragstart",
   ];
 
-  // stop event propagation
   [].forEach.call(eventNameListArray, function (event) {
     document.addEventListener(
       event,
@@ -56,22 +51,20 @@ function enableCopy() {
   injectScriptDisablePropagateEvent.type = "text/javascript";
   document.body.appendChild(injectScriptDisablePropagateEvent);
 
-  // make dom events null for child content script
   injectScriptDisablePropagateEvent.innerHTML = `
-		document.oncontextmenu = null;
-		document.body.onpaste = null;
-		document.body.onselectstart = null;
-		document.onselectstart = null;
-		document.ondragstart = null;
-		document.body.oncut = null;
-		document.onmousedown = null;
-		document.body.oncontextmenu = null;
-		document.body.oncopy = null;
-		document.body.ondragstart = null;
-		document.body.onmousedown = null;
-	`;
+          document.oncontextmenu = null;
+          document.body.onpaste = null;
+          document.body.onselectstart = null;
+          document.onselectstart = null;
+          document.ondragstart = null;
+          document.body.oncut = null;
+          document.onmousedown = null;
+          document.body.oncontextmenu = null;
+          document.body.oncopy = null;
+          document.body.ondragstart = null;
+          document.body.onmousedown = null;
+      `;
 
-  // make body events null
   document.body.oncontextmenu = null;
   document.body.onmousedown = null;
   document.body.oncut = null;
@@ -80,7 +73,6 @@ function enableCopy() {
   document.body.ondragstart = null;
   document.body.onpaste = null;
 
-  // make doc events null
   document.oncontextmenu = null;
   document.onmousedown = null;
   document.ondragstart = null;
@@ -88,8 +80,6 @@ function enableCopy() {
 
   setTimeout(function () {
     document.oncontextmenu = null;
-
-    registerSelect();
   }, 2000);
 
   var newEventNameList = ["select", "selectstart", "copy", "paste", "cut"];
@@ -104,133 +94,70 @@ function enableCopy() {
     );
   });
 
-  window.addEventListener(
-    "contextmenu",
-    function handleEvent(event) {
-      event.stopPropagation();
-      event.stopImmediatePropagation();
-      var h = new CustomEventHandler(event);
-      window.removeEventListener(event.type, handleEvent, true);
-      var newECallBack = new NewEventCaller(function () {});
-      h.fire();
-      window.addEventListener(event.type, handleEvent, true);
-      if (newECallBack.isCalled && h.isCanceled) {
-        event.preventDefault();
-      }
-    },
-    true
-  );
-
-  function NewEventCaller(cb) {
-    var eventNameListArray = [
-      "DOMAttrModified",
-      "DOMNodeInserted",
-      "DOMNodeRemoved",
-      "DOMCharacterDataModified",
-      "DOMSubtreeModified",
-    ];
-    this.events = eventNameListArray;
-    this.bind();
-  }
-
-  NewEventCaller.prototype.bind = function () {
-    this.events.forEach(
-      function (event) {
-        document.addEventListener(event, this, true);
-      }.bind(this)
-    );
-  };
-
-  NewEventCaller.prototype.handleEvent = function () {
-    this.isCalled = true;
-  };
-
-  NewEventCaller.prototype.unbind = function () {
-    this.events.forEach(function (event) {}.bind(this));
-  };
-
-  function CustomEventHandler(e) {
-    this.event = e;
-    this.contextmenuEvent = this.createEvent(this.event.type);
-  }
-
-  CustomEventHandler.prototype.fire = function () {
-    var et = this.event.target;
-    var h = function (event) {
-      event.preventDefault();
-    }.bind(this);
-    et.dispatchEvent(this.contextmenuEvent);
-    this.isCanceled = this.contextmenuEvent.defaultPrevented;
-  };
-
-  CustomEventHandler.prototype.createEvent = function (type) {
-    var et = this.event.target;
-    var cevent = et.ownerDocument.createEvent("MouseEvents");
-    cevent.initMouseEvent(
-      type,
-      this.event.bubbles,
-      this.event.cancelable,
-      et.ownerDocument.defaultView,
-      this.event.detail,
-      this.event.screenX,
-      this.event.screenY,
-      this.event.clientX,
-      this.event.clientY,
-      this.event.ctrlKey,
-      this.event.altKey,
-      this.event.shiftKey,
-      this.event.metaKey,
-      this.event.button,
-      this.event.relatedTarget
-    );
-    return cevent;
-  };
-
   console.log("enable copy executed");
 }
 
 enableCopy();
 
+function showToast(message) {
+  //   console.log("show toast", message);
+  const toast = document.createElement("div");
+  toast.innerText = message;
+  toast.style.position = "fixed";
+  toast.style.top = "20px";
+  toast.style.right = "30px";
+  toast.style.transform = "translateX(-50%)";
+  toast.style.background = "#323232";
+  toast.style.color = "white";
+  toast.style.padding = "10px 16px";
+  toast.style.borderRadius = "8px";
+  toast.style.zIndex = 10001;
+  toast.style.opacity = 0.8;
+  toast.style.fontSize = "14px";
+  toast.style.boxShadow = "0 2px 6px rgba(0,0,0,0.3)";
+  document.body.appendChild(toast);
+  setTimeout(() => {
+    toast.remove();
+  }, 2500);
+}
+
+showToast("hello world");
+
 function registerSelect() {
   console.log("register select called");
-  // Tạo nút icon nổi
-  const icon = document.createElement("img");
-  icon.src = chrome.runtime.getURL("icon.png");
-  icon.style.position = "absolute";
-  icon.style.width = "24px";
-  icon.style.height = "24px";
-  icon.style.cursor = "pointer";
-  icon.style.zIndex = 10000;
-  icon.style.display = "none";
-  document.body.appendChild(icon);
 
-  // Lưu text được chọn
   let selectedText = "";
 
-  document.addEventListener("mouseup", (e) => {
+  document.addEventListener("mouseup", () => {
     const text = window.getSelection().toString().trim();
     if (text.length > 0) {
       selectedText = text;
-      const rect = window.getSelection().getRangeAt(0).getBoundingClientRect();
-      icon.style.top = `${window.scrollY + rect.top - 30}px`;
-      icon.style.left = `${window.scrollX + rect.left}px`;
-      icon.style.display = "block";
-    } else {
-      icon.style.display = "none";
     }
   });
 
-  // Xử lý khi click vào icon
-  icon.addEventListener("click", async () => {
-    const prompt = `giải thích bằng tiếng Việt: ${selectedText}`;
-    try {
-      await navigator.clipboard.writeText(prompt);
-      alert("Đã copy prompt vào clipboard!");
-    } catch (err) {
-      console.error("Lỗi khi copy:", err);
+  chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
+    if (request.action === "copy_prompt") {
+      const selectedText = window.getSelection().toString().trim();
+
+      if (selectedText.length > 0) {
+        const prompt = `giải thích bằng tiếng Việt: ${selectedText}`;
+        navigator.clipboard
+          .writeText(prompt)
+          .then(() => showToast("✅ Prompt đã được copy!"))
+          .catch(() => showToast("❌ Không thể copy clipboard."));
+      } else {
+        showToast("⚠️ Không có nội dung nào được chọn.");
+      }
+
+      console.log(`request: ${request.action}: ${selectedText}`);
     }
-    icon.style.display = "none";
   });
 
   console.log("register select executed");
 }
+
+// chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
+//   console.log(`request2: ${request.action}`);
+// });
+
+registerSelect();
