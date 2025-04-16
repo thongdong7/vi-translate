@@ -20,7 +20,7 @@ function enableCopy() {
     "cut",
     "contextmenu",
     "mousedown",
-    "mouseup",
+    // "mouseup",
     "selectstart",
     "select",
     "paste",
@@ -123,16 +123,57 @@ function showToast(message) {
 
 showToast("hello world");
 
+function createCopyIcon(x, y, text) {
+  // Xóa icon cũ nếu có
+  const existing = document.getElementById("custom-copy-icon");
+  if (existing) existing.remove();
+
+  const icon = document.createElement("div");
+  icon.id = "custom-copy-icon";
+  icon.innerText = "📋";
+  icon.style.position = "absolute";
+  icon.style.top = `${y + 10}px`;
+  icon.style.left = `${x + 10}px`;
+  icon.style.cursor = "pointer";
+  icon.style.background = "#fff";
+  icon.style.border = "1px solid #ccc";
+  icon.style.borderRadius = "6px";
+  icon.style.padding = "2px 6px";
+  icon.style.fontSize = "14px";
+  icon.style.zIndex = 10000;
+  icon.style.boxShadow = "0 2px 4px rgba(0,0,0,0.2)";
+  icon.style.userSelect = "none";
+
+  icon.addEventListener("click", () => {
+    const prompt = `giải thích bằng tiếng Việt: ${text}`;
+    navigator.clipboard
+      .writeText(prompt)
+      .then(() => showToast("✅ Prompt đã được copy!"))
+      .catch(() => showToast("❌ Không thể copy clipboard."));
+    icon.remove();
+  });
+
+  document.body.appendChild(icon);
+}
+
 function registerSelect() {
   console.log("register select called");
 
-  let selectedText = "";
-
-  document.addEventListener("mouseup", () => {
-    const text = window.getSelection().toString().trim();
-    if (text.length > 0) {
-      selectedText = text;
-    }
+  document.addEventListener("mouseup", (e) => {
+    setTimeout(() => {
+      const selectedText = window.getSelection().toString().trim();
+      console.log("selectedText", selectedText);
+      if (selectedText.length > 0) {
+        const range = window.getSelection().getRangeAt(0);
+        const rect = range.getBoundingClientRect();
+        const x = rect.right + window.scrollX;
+        const y = rect.top + window.scrollY;
+        createCopyIcon(x, y, selectedText);
+      } else {
+        const existing = document.getElementById("custom-copy-icon");
+        if (existing) existing.remove();
+      }
+    }, 0);
   });
 
   chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
@@ -159,5 +200,6 @@ function registerSelect() {
 // chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
 //   console.log(`request2: ${request.action}`);
 // });
-
-registerSelect();
+setTimeout(() => {
+  registerSelect();
+}, 1000);
